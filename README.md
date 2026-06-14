@@ -184,3 +184,49 @@ ip route 192.168.1.0 255.255.255.0 10.0.1.1
 do write memory
 end
 ```
+
+# 04. IoT Carbon Monoxide Detection and Automated Ventilation System (Packet Tracer)
+
+This project demonstrates the implementation of a local Internet of Things (IoT) monitoring and automation network using Cisco Packet Tracer. The network is designed for environmental safety monitoring: a Carbon Monoxide Detector monitors emissions from an old vehicle and automatically triggers a ventilation fan when toxic gas levels cross defined thresholds. The entire system operates within a single flat network segment (`192.168.0.0/24`) managed by a central IoT Registration Server.
+
+## 📐 Network Topology
+
+Below is the visual network topology diagram showing how the server, switch, and smart IoT devices are interconnected in Cisco Packet Tracer:
+
+![Network Topology Diagram](images/04.png)
+
+Addressing and Port Assignment Table:
+
+| Device | Connected To | Interface / Port | IP Address | Subnet Mask | IoT Gateway / Server |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Server3** (IoT Server) | Switch1 | FastEthernet 0 | `192.168.0.1` | `255.255.255.0` | *Local / Services Active* |
+| **Carbon Monoxide Detector** | Switch1 | FastEthernet 0 | `192.168.0.2` | `255.255.255.0` | `192.168.0.1` |
+| **Fan** | Switch1 | FastEthernet 0 | `192.168.0.3` | `255.255.255.0` | `192.168.0.1` |
+| **Switch1** | Central Interconnect | Multiple Ports | *N/A* | *N/A* | *N/A* |
+
+*Note: The login credentials configured for the IoT Server management dashboard are `admin` / `admin`.*
+
+## 🛠️ IoT Automation Rules Configuration
+
+To replicate this automation logic, log into the IoT Server web console interface by navigating to `http://192.168.0.1/conditions.html` via the desktop web browser of a connected device, and configure the following conditional action rules:
+
+### 1. Ventilation Activation Rule (alarm_ON)
+
+This condition monitors the CO detector sensor levels and turns the exhaust/ventilation fan to its highest capacity once hazardous levels are reached.
+
+```text
+Rule Name:  alarm_ON
+Enabled:    Yes
+Condition:  IoT0 Level > 0.02
+Action:     Set IoT1 Status to High
+```
+### 2. Ventilation Deactivation Rule (alarm_OFF)
+This condition tracks when the environment returns to safe parameters, turning off the exhaust fan to conserve power once gas levels clear.
+
+```text
+Rule Name:  alarm_OFF
+Enabled:    Yes
+Condition:  IoT0 Level < 0.019
+Action:     Set IoT1 Status to Off
+
+```
