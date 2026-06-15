@@ -230,3 +230,105 @@ Condition:  IoT0 Level < 0.019
 Action:     Set IoT1 Status to Off
 
 ```
+
+# 05. Multi-Router Static Routing Configuration with a Transit Router (Packet Tracer)
+
+This project demonstrates an advanced multi-router network architecture utilizing a central transit router to interconnect two separate Local Area Networks (LANs). The environment is segmented into four unique subnets: `192.168.1.0/24` (left LAN), `10.0.0.0/24` (left transit link), `10.0.1.0/24` (right transit link), and `192.168.2.0/24` (right LAN), establishing explicit multi-hop static routing paths across the network core.
+
+## 📐 Network Topology
+
+Below is the visual network topology diagram showing how the PCs, switches, and the three routers are interconnected in Cisco Packet Tracer:
+
+![Network Topology Diagram](images/05.png)
+
+### Addressing and Port Assignment Table:
+
+| Device | Connected To | Interface / Port | IP Address | Subnet Mask | Default Gateway |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Router0** | Switch0 (Left LAN) | GigabitEthernet 0/0 | `192.168.1.10` | `255.255.255.0` | *N/A* |
+| **Router0** | Top Router (Left WAN) | GigabitEthernet 0/1 | `10.0.0.1` | `255.255.255.0` | *N/A* |
+| **Top Router** | Router0 (Left WAN) | GigabitEthernet 0/0 | `10.0.0.2` | `255.255.255.0` | *N/A* |
+| **Top Router** | Router1 (Right WAN) | GigabitEthernet 0/1 | `10.0.1.2` | `255.255.255.0` | *N/A* |
+| **Router1** | Top Router (Right WAN) | GigabitEthernet 0/1 | `10.0.1.1` | `255.255.255.0` | *N/A* |
+| **Router1** | Switch1 (Right LAN) | GigabitEthernet 0/0 | `192.168.2.10` | `255.255.255.0` | *N/A* |
+| **PC0 (Left)** | Switch0 | FastEthernet 0 | `192.168.1.1` | `255.255.255.0` | `192.168.1.10` |
+| **PC1 (Left)** | Switch0 | FastEthernet 0 | `192.168.1.2` | `255.255.255.0` | `192.168.1.10` |
+| **PC2 (Right)** | Switch1 | FastEthernet 0 | `192.168.2.1` | `255.255.255.0` | `192.168.2.10` |
+| **PC3 (Right)** | Switch1 | FastEthernet 0 | `192.168.2.2` | `255.255.255.0` | `192.168.2.10` |
+
+---
+
+## 🛠️ Configuration Guide (CLI Script)
+
+To replicate this configuration, log into the respective Cisco Router Command Line Interface (**CLI**) and execute the following commands to assign IP addresses, activate interfaces, and inject the static paths:
+
+### Router Configuration (Left Side)
+```text
+enable
+configure terminal
+
+
+interface GigabitEthernet0/0
+ ip address 192.168.1.10 255.255.255.0
+ no shutdown
+exit
+
+
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.255.255.0
+ no shutdown
+exit
+
+
+ip route 192.168.2.0 255.255.255.0 10.0.0.2
+do write memory
+end
+```
+### Router Configuration (Central Transit Hub)
+```text
+enable
+configure terminal
+
+
+interface GigabitEthernet0/0
+ ip address 10.0.0.2 255.255.255.0
+ no shutdown
+exit
+
+
+interface GigabitEthernet0/1
+ ip address 10.0.1.2 255.255.255.0
+ no shutdown
+exit
+
+
+ip route 192.168.1.0 255.255.255.0 10.0.0.1
+ip route 192.168.2.0 255.255.255.0 10.0.1.1
+do write memory
+end
+
+
+```
+### Router Configuration (Right Side)
+```text
+enable
+configure terminal
+
+
+interface GigabitEthernet0/1
+ ip address 10.0.1.1 255.255.255.0
+ no shutdown
+exit
+
+
+interface GigabitEthernet0/0
+ ip address 192.168.2.10 255.255.255.0
+ no shutdown
+exit
+
+
+ip route 192.168.1.0 255.255.255.0 10.0.1.2
+do write memory
+end
+
+```
