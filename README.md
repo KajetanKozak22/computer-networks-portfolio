@@ -332,3 +332,89 @@ do write memory
 end
 
 ```
+
+# 06. Network Application Services: DHCP, FTP, and EMAIL Configurations (Packet Tracer)
+
+This project demonstrates the deployment and configuration of essential network application services within a local area network environment using Cisco Packet Tracer. The infrastructure is segmented into three logical, flat service blocks operating on the `192.168.1.0/24` subnet: a Dynamic Host Configuration Protocol (**DHCP**) block for automated IP assignment, a File Transfer Protocol (**FTP**) block for centralized storage, and an electronic mail (**EMAIL**) block for local messaging services.
+
+
+
+## 📐 Network Topology
+
+The network consists of three separate switch-based environments, each dedicated to showcasing a specific network service layer:
+
+![Network Topology Diagram](images/06.png)
+
+### Addressing and Port Assignment Table:
+
+| Block / Zone | Device | Switch Port | Interface | IP Address | Subnet Mask | Default Gateway |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DHCP** | **Server0** (DHCP Ser.) | FastEthernet 3/1 | FastEthernet 0 | `192.168.1.1` | `255.255.255.0` | *N/A* |
+| **DHCP** | **PC0** | FastEthernet 1/1 | FastEthernet 0 | *DHCP Assigned* | `255.255.255.0` | *N/A* |
+| **DHCP** | **PC1** | FastEthernet 2/1 | FastEthernet 0 | *DHCP Assigned* | `255.255.255.0` | *N/A* |
+| **DHCP** | **PC2** | *Not Explicitly Marked* | FastEthernet 0 | *DHCP Assigned* | `255.255.255.0` | *N/A* |
+| **EMAIL** | **Server1** (Email Ser.) | FastEthernet 0/4 | FastEthernet 0 | `192.168.1.1` | `255.255.255.0` | *N/A* |
+| **EMAIL** | **PC4** | FastEthernet 0/2 | FastEthernet 0 | *Static / Assigned* | `255.255.255.0` | *N/A* |
+| **EMAIL** | **PC5** | FastEthernet 0/3 | FastEthernet 0 | *Static / Assigned* | `255.255.255.0` | *N/A* |
+| **FTP** | **Server-PT** (FTP Ser.) | FastEthernet 0/2 | FastEthernet 0 | `192.168.1.5` | `255.255.255.0` | *N/A* |
+| **FTP** | **PC7** | FastEthernet 0/3 | FastEthernet 0 | `192.168.1.10` | `255.255.255.0` | *N/A* |
+| **FTP** | **PC6** | FastEthernet 0/4 | FastEthernet 0 | `192.168.1.11` | `255.255.255.0` | *N/A* |
+
+---
+
+## 🛠️ Service Configuration Guide
+
+To replicate this implementation, configure the respective standalone servers via the Packet Tracer GUI services tab with the following operational parameters:
+
+### 1. DHCP Server Configuration (Server0)
+Navigate to **Services -> DHCP** on Server0, ensure the service is turned **ON**, and update the default pool settings:
+
+    Interface:          FastEthernet 0
+    Service:            On
+    Pool Name:          serverPool
+    Default Gateway:    192.168.1.1
+    Start IP Address:   192.168.1.2
+    Subnet Mask:        255.255.255.0
+    Maximum Users:      254
+
+*Note: After saving, go to PC0, PC1, and PC2 -> Desktop -> IP Configuration and switch the toggle from Static to **DHCP** to automatically fetch IP parameters.*
+
+### 2. EMAIL Server Configuration (Server1)
+Navigate to **Services -> EMAIL** on Server1. Ensure both **SMTP** and **POP3** services are turned **ON**:
+
+    Domain Name:        kozak.pl 
+
+Click **Set** to initialize the domain, then create user accounts matching the specified credentials:
+* **User 1:** User: `user` / Password: `1234`
+* **User 2:** User: `user1` / Password: `1234`
+
+*Note: Configure the Mail client app on PC4 and PC5 under Desktop -> Email using the incoming/outgoing mail server IP `192.168.1.1` and their respective credentials.*
+
+### 3. FTP Server Configuration (Server-PT - FTP)
+Navigate to **Services -> FTP** on the FTP Server. Ensure the FTP service is turned **ON** and create a dedicated user credential group matching the laboratory diagram:
+
+    Username:           cisco
+    Password:           cisco
+    Permissions:        [X] Read  [X] Write  [X] Delete  [X] Rename  [X] List
+
+---
+
+## 🔬 Verification and Testing
+
+To confirm the application servers are functioning correctly, perform the following validation tests directly from the client endpoints:
+
+### DHCP Validation
+Open the **Command Prompt** on **PC0** and verify it received an IP address from the pool:
+
+    ipconfig /all
+
+### FTP Connectivity Test
+From **PC7** or **PC6** Command Prompt, establish an active FTP control session using the authorized `cisco` credentials:
+
+    C:\> ftp 192.168.1.5
+    Welcome to Packet Tracer FTP server
+    User: cisco
+    Password: 
+    Logged in.
+    ftp> dir
+    ftp> quit
